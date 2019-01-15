@@ -1,0 +1,27 @@
+{
+  "name": "node-red-contrib-ifttt-broker",
+  "version": "0.1.0",
+  "description": "An IFTTT broker for Node-RED",
+  "main": "ifttt-broker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ian G <yo.ian.g@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "ifttt": "github:Adorkable-forkable/node-ifttt"
+  },
+  "node-red": {
+    "nodes": {
+      "ifttt-broker": "ifttt-broker.js",
+      "ifttt-action": "ifttt-action.js",
+      "ifttt-trigger": "ifttt-trigger.js"
+    }
+  },
+  "devDependencies": {
+    "eslint": "5.x",
+    "eslint-plugin-angular": "4.x"
+  }
+}

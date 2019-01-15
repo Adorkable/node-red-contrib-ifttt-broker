@@ -1,0 +1,67 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ifttt-trigger',{
+        category: 'input',
+        defaults: {
+            broker: {
+                type: "ifttt-broker",
+                required: true
+            },
+            endpoint: {
+                value: "",
+                required: true
+            },
+            field: {
+                value: ""
+            },
+            fieldValidSampleData: {
+                value: ""
+            },
+            fieldInvalidSampleData: {
+                value: ""
+            },
+            name: { value: "" }
+        },
+        color: "#ffcc00",
+        inputs: 1,
+        outputs: 0,
+        align: 'right',
+        icon: "logo.png",
+        label: function() {
+            return this.name || this.endpoint || "ifttt";
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="ifttt-trigger">
+    <div class="form-row">
+        <label for="node-input-broker"><i class="fa fa-globe"></i> IFTTT broker</label>
+        <input type="text" id="node-input-broker">
+    </div>
+    <div class="form-row">
+        <label for="node-input-endpoint"><i class="fa fa-tag"></i> Endpoint</label>
+        <input type="text" id="node-input-endpoint">
+    </div>
+    <div class="form-row">
+        <label for="node-input-field"><i class="fa fa-tag"></i> Trigger field</label>
+        <input type="text" id="node-input-field" placeholder="Leave blank to not use one">
+    </div>
+    <div class="form-row">
+        <label for="node-input-fieldValidSampleData"><i class="fa fa-tag"></i> Action field Valid Sample Data</label>
+        <input type="text" id="node-input-fieldValidSampleData" placeholder="If using an Trigger Field this is a required field">
+    </div>
+    <div class="form-row">
+        <label for="node-input-fieldInvalidSampleData"><i class="fa fa-tag"></i> Trigger field SKIP Sample Data</label>
+        <input type="text" id="node-input-fieldInvalidSampleData" placeholder="If using an Trigger Field this is a required field">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ifttt-trigger">
+    <p>An IFTTT trigger</p>
+</script>

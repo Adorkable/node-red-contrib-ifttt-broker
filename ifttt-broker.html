@@ -1,0 +1,84 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ifttt-broker',{
+        category: 'config',
+        defaults: {
+            host: {
+                value:"localhost",
+                required: true
+            },
+            port: { 
+                value: 80, 
+                validate: RED.validators.number(),
+                required: true
+            }, 
+            apiVersion: {
+                value: "v1",
+                required: false
+            },
+            authenticationMode: {
+                value: 'header',
+                required: false
+            },
+            logger: {
+                value: 'console',
+                required: false
+            },
+            testAccessToken: {
+                value: "",
+                required: false
+            },
+            serviceKey: {
+                value: "",
+                required: true
+            },
+            userAccessToken: {
+                value: "",
+                required: false
+            },
+            name: { 
+                value: "" 
+            }
+        },
+        color: "#ffcc00",
+        inputs: 0,
+        outputs: 1,
+        icon: "logo.png",
+        label: function() {
+            return this.host+":"+this.port;
+        },
+        labelStyle: function() {
+            return this.name ? "node_label_italic" : "";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="ifttt-broker">
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="icon-bookmark"></i> Host</label>
+        <input type="text" id="node-config-input-host">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-port"><i class="icon-bookmark"></i> Port</label>
+        <input type="text" id="node-config-input-port">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-serviceKey"><i class="fa fa-user"></i> Service Key</label>
+        <input type="text" id="node-config-input-serviceKey">
+    </div>
+    <!-- <div class="form-row">
+        <label for="node-config-input-username"><i class="fa fa-user"></i> Username</label>
+        <input type="text" id="node-config-input-username" placeholder="leave blank to disable">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password"><i class="fa fa-key"></i> Password</label>
+        <input type="password" id="node-config-input-password" placeholder="leave blank to disable">
+    </div> -->
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ifttt-broker">
+    <p>An IFTTT broker for Node-RED.</p>
+</script>
