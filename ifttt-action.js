@@ -18,7 +18,7 @@ module.exports = function (RED) {
 
     this.endpoint = n.endpoint;
 
-    this.field = utility.createIFTTTFieldConfig(n.field, n.fieldValidSampleData, n.fieldInvalidSampleData);
+    this.fields = n.fields;
 
     if (this.brokerNode.ifttt) {
 
@@ -37,6 +37,7 @@ module.exports = function (RED) {
       utility.setNodeStatus(node, false);
     }
 
+    // TODO: is this more robust, more dangerous, or no difference to calling node.send directly
     this.on("input", function(msg) {
       msg.topic = this.endpoint;
 

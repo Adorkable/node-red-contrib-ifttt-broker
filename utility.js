@@ -43,16 +43,5 @@ module.exports = {
         }
 
         return request.get('IFTTT-Test-Mode') === '1';
-    },
-
-    createIFTTTFieldConfig(name, validSampleData, invalidSampleData) {
-        if (!this.ensureStringOfLength(name)) {
-            return undefined;
-        }
-        return {
-            name: name,
-            validSampleData: this.ensureStringOfLength(validSampleData),
-            invalidSampleData: this.ensureStringOfLength(invalidSampleData)
-        };
     }
 }

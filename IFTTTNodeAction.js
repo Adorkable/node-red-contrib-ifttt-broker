@@ -2,6 +2,7 @@
 var ifttt = require('ifttt');
 var iftttNodeActionField = require('./IFTTTNodeActionField');
 var util = require('util');
+var utility = require('./utility');
 
 module.exports = {
     class: function(node) {
@@ -14,57 +15,70 @@ module.exports = {
 
         action.prototype._getResponseData = function(request, requestPayload, callback) {
 
+            var fields = node.fields;
+            if (!Array.isArray(fields)) {
+                return action.generateErrorResponse('fields is unexpected type \'' + typeof fields + '\'', true, callback);
+            }
+
             const createResult = function() {
                 return {
                     'id': node.endpoint + '_' + new Date()
                 };
             };
-  
-            const handleTest = function(action, node, callback) {
+
+            const handleTest = function(action, callback) {
                 var results = [];
     
                 var result = createResult();
     
-                const field = node.field;
-                if (typeof field === 'object' && typeof field.name === 'string') {
-                    const fieldValue = requestPayload.getField(field.name);
-    
-                    if (field.invalidSampleData && fieldValue === field.invalidSampleData) {
-                        return action.generateErrorResponse('Invalid value \'' + fieldValue + '\' for action field \'' + field.name + '\'', true, callback);
-                    } else if (field.validSampleData && fieldValue === field.validSampleData) {
-                    } else {
-                      // TODO: should report unexpected
+                for(var index = 0; index < fields.length; index ++) {
+                    var field = fields[index];
+                    if (typeof field === 'object' && typeof field.name === 'string') {
+                        const fieldValue = requestPayload.getField(field.name);
+        
+                        if (field.sampleDataInvalid && fieldValue === field.sampleDataInvalid) {
+                            return action.generateErrorResponse('Invalid value \'' + fieldValue + '\' for action field \'' + field.name + '\'', true, callback);
+                        } else if (field.sampleDataValid && fieldValue === field.sampleDataValid) {
+                        } else {
+                            // TODO: should report unexpected
+                        }
                     }
-    
-                    results.push(result);
                 }
+                
+                results.push(result);
     
                 return callback(null, results);
             };
   
             if (utility.isTestMode(request)) {
-                return handleTest(this, this.node, callback);
+                return handleTest(this, callback);
             }
   
             var nodePayload = {
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                fields: {}
             };
   
-            const field = this.node.field;
-            if (typeof field === 'object' && typeof field.name === 'string') {
-                const fieldValue = requestPayload.getField(field.name);
-                if (typeof fieldValue === 'undefined') {
-                  return action.generateErrorResponse('Value required for action field \'' + field.name + '\'', true, callback);
+            // TODO: error if required field isn't provided
+            // TODO: ensure we have all fields configured for response requirements
+            for(var index = 0; index < fields.length; index ++) {
+                const field = fields[field];
+
+                if (typeof field === 'object' && typeof field.name === 'string') {
+                    const fieldValue = requestPayload.getField(field.name);
+                    if (typeof fieldValue === 'undefined' && field.required) {
+                        return action.generateErrorResponse('Value required for action field \'' + field.name + '\'', true, callback);
+                    }
+        
+                    nodePayload.fields[field.name] = fieldValue;
                 }
-    
-                nodePayload.fields = {};
-                nodePayload.fields[field.name] = fieldValue;
             }
   
             this.node.emit("input", {
                 payload: nodePayload
             });
   
+            // TODO: double check if we need to respond with the processed fields
             var results = [
                 createResult()
             ]; 
@@ -74,13 +88,19 @@ module.exports = {
         return action;
     },
     createDefault: function(node) {
-      const result = new (this.class(node))();
-  
-      if (node.field !== undefined) {
-          const actionFieldInstance = iftttNodeActionField.createDefault(node.field, true);
-          result.registerField(actionFieldInstance);
-      }
-  
-      return result;
+        const result = new (this.class(node))();
+    
+        if (Array.isArray(node.fields)) {
+            for(var index = 0; index < node.fields.length; index ++) {
+                const field = node.fields[index];
+
+                const actionFieldInstance = iftttNodeActionField.createDefault(field);
+                result.registerField(actionFieldInstance);
+            }
+        } else {
+            node.error("fields of unexpected type '" + typeof node.fields + "'");
+        }
+    
+        return result;
     }
   };
