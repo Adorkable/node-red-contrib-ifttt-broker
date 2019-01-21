@@ -102,6 +102,7 @@ module.exports = {
                     }
                 }
 
+                var missingIngredients = [];
                 // TODO: ensure we have all ingredients configured for node expectation and IFTTT expectation
                 for(var index = 0; index < this.node.ingredients.length; index ++) {
                     const ingredient = this.node.ingredients[index];
@@ -110,13 +111,17 @@ module.exports = {
                         if (typeof msg.payload.payload[ingredient.slug] !== 'undefined') {
                             result[ingredient.slug] = msg.payload.payload[ingredient.slug];
                         } else {
-                            // TODO: should not include result, should potentially be handled downstream at queue?
-                            result[ingredient.slug] = 'Invalid';
+                            missingIngredients.push(ingredient.slug);
                         }
                     }
                 }
-      
-                results.push(result);
+
+                // TODO: should potentially be handled downstream at queue?
+                if (missingIngredients.length === 0) {
+                    results.push(result);
+                } else {
+                    this.node.error("Trigger event payload missing ingredients: '" + missingIngredients + "'")
+                }      
             }
       
             this.node.log("Sending IFTTT " + results.length + " trigger events");
