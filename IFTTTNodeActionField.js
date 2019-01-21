@@ -13,11 +13,11 @@ module.exports = {
 
         return actionField;    
     },
-    createDefault: function(field, required) {
+    createDefault: function(field) {
         const result = new (this.class(field))();
 
-        result.fieldRequired = required;
-        result.setOptionsSampleData(field.validSampleData, field.invalidSampleData);
+        result.fieldRequired = field.required;
+        result.setOptionsSampleData(field.sampleDataValid, field.sampleDataInvalid);
     
         return result;
     }

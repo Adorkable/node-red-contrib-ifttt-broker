@@ -2,6 +2,7 @@
 var ifttt = require('ifttt');
 var iftttNodeTriggerField = require('./IFTTTNodeTriggerField');
 var util = require('util');
+var utility = require('./utility');
 
 module.exports = {
     class: function(node) {
@@ -13,6 +14,12 @@ module.exports = {
         trigger.prototype.node = node;
 
         trigger.prototype._getResponseData = function(request, requestPayload, callback) {
+
+            var fields = node.fields;
+            if (!Array.isArray(fields)) {
+                return trigger.generateErrorResponse('fields is unexpected type \'' + typeof fields + '\'', true, callback);
+            }
+
             const createResult = function(node, date) {
                 const timestamp = Math.floor(date.getTime() / 1000);
                 return {
@@ -30,17 +37,28 @@ module.exports = {
                 for (var count = 0; count < (responseLimit || 50); count ++) { // IFTTT defaults to max 50 responses if no limit is defined
                     var result = createResult(node, new Date(new Date().getTime() - count * 1000));
       
-                    const field = node.field;
-                    if (typeof field === 'object' && typeof field.name === 'string') {
-                        const fieldValue = requestPayload.getField(field.name);
-      
-                        if (field.invalidSampleData && fieldValue === field.invalidSampleData) {
-                        // TODO: this isn't really supposed to happen apparently
-                        // TODO: think about what to do here
-                        } else if (field.validSampleData && fieldValue === field.validSampleData) {
-                            result[field.name] = 'triggered';
-                        } else {
-                            // TODO: should report unexpected
+                    for(var index = 0; index < fields.length; index ++) {
+                        const field = fields[index];
+                        if (typeof field === 'object' && typeof field.name === 'string') {
+                            const fieldValue = requestPayload.getField(field.name);
+            
+                            if (field.sampleDataInvalid && fieldValue === field.sampleDataInvalid) {
+                            // TODO: this isn't really supposed to happen apparently
+                            // TODO: think about what to do here
+                            } else if (field.sampleDataValid && fieldValue === field.sampleDataValid) {
+                                result[field.name] = 'processed';
+                            } else {
+                                // TODO: should report unexpected
+                            }
+                        }
+                    }
+
+                    // TODO: ensure we have all ingredients configured for node expectation and IFTTT expectation
+                    for(var index = 0; index < node.ingredients.length; index ++) {
+                    const ingredient = node.ingredients[index];
+    
+                        if (typeof ingredient === 'object' && typeof ingredient.slug === 'string') {
+                            result[ingredient.slug] = 'This is a test.';
                         }
                     }
       
@@ -68,19 +86,42 @@ module.exports = {
       
                 var result = createResult(this.node, msg.payload.createdAt);
       
-                const field = this.node.field;
-                if (typeof field === 'object' && typeof field.name === 'string') {
-                    // const fieldValue = requestPayload.getField(field.name);
-                    if (typeof msg.payload[field.name] === 'undefined') {
-                    // continue;
-                        msg.payload[field.name] = 'fakeData';
+                // TODO: ensure we have all fields configured for node expectation and IFTTT expectation
+                for(var index = 0; index < fields.length; index ++) {
+                    const field = fields[index];
+
+                    if (typeof field === 'object' && typeof field.name === 'string') {
+                        const fieldValue = requestPayload.getField(field.name);
+                        if (typeof fieldValue === 'undefined') {
+                            return action.generateErrorResponse('Value required for trigger field \'' + field.name + '\'', true, callback);
+                        }
+
+                        // TODO: filter via match, regex, etc
+                        // TODO: custom function processing
+                        result[field.name] = 'processed';
                     }
-      
-                    result[field.name] = msg.payload[field.name];
-                    console.log(result);
                 }
-      
-                results.push(result);
+
+                var missingIngredients = [];
+                // TODO: ensure we have all ingredients configured for node expectation and IFTTT expectation
+                for(var index = 0; index < this.node.ingredients.length; index ++) {
+                    const ingredient = this.node.ingredients[index];
+
+                    if (typeof ingredient === 'object' && typeof ingredient.slug === 'string') {
+                        if (typeof msg.payload.payload[ingredient.slug] !== 'undefined') {
+                            result[ingredient.slug] = msg.payload.payload[ingredient.slug];
+                        } else {
+                            missingIngredients.push(ingredient.slug);
+                        }
+                    }
+                }
+
+                // TODO: should potentially be handled downstream at queue?
+                if (missingIngredients.length === 0) {
+                    results.push(result);
+                } else {
+                    this.node.error("Trigger event payload missing ingredients: '" + missingIngredients + "'")
+                }      
             }
       
             this.node.log("Sending IFTTT " + results.length + " trigger events");
@@ -94,7 +135,7 @@ module.exports = {
       const result = new (this.class(node))();
   
       if (node.field !== undefined) {
-          const triggerFieldInstance = iftttNodeTriggerField.createDefault(node.field, true);
+          const triggerFieldInstance = iftttNodeTriggerField.createDefault(node.field);
           result.registerField(triggerFieldInstance);
       }
   
