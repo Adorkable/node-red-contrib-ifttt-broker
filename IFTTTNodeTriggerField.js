@@ -13,11 +13,10 @@ module.exports = {
 
         return triggerField;
     },
-    createDefault: function(field, required) {
+    createDefault: function(field) {
       const result = new (this.class(field))();
   
-      result.fieldRequired = required;
-      result.setOptionsSampleData(field.validSampleData, field.invalidSampleData);
+      result.setOptionsSampleData(field.sampleDataValid, field.sampleDataInvalid);
   
       return result;
     }

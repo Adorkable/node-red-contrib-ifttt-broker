@@ -10,14 +10,40 @@
                 value: "",
                 required: true
             },
-            field: {
-                value: ""
+            fields: {
+                value: [], 
+                validate:function(fieldsValue) {
+                    if (!fieldsValue) {
+                        return false;
+                    }
+                    for (var index = 0; index < fieldsValue.length; index ++) {
+                        if (!fieldsValue[index].name || fieldsValue[index].name.length === 0) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }, 
+                required:true
             },
-            fieldValidSampleData: {
-                value: ""
-            },
-            fieldInvalidSampleData: {
-                value: ""
+            ingredients: {
+                value: [{
+                    slug: ""
+                }], 
+                validate:function(ingredientsValue) {
+                    if (!ingredientsValue) {
+                        return false;
+                    }
+                    if (!Array.isArray(ingredientsValue) || ingredientsValue.length === 0) {
+                        return false;
+                    }
+                    for (var index = 0; index < ingredientsValue.length; index ++) {
+                        if (!ingredientsValue[index].slug || ingredientsValue[index].slug.length === 0) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }, 
+                required: true
             },
             name: { value: "" }
         },
@@ -31,6 +57,157 @@
         },
         labelStyle: function() {
             return this.name ? "node_label_italic" : "";
+        },
+
+        oneditprepare: function() {
+            if ($("#node-input-submit").val() === null) { $("#node-input-submit").val("submit"); }
+            if ($("#node-input-cancel").val() === null) { $("#node-input-cancel").val("cancel"); }
+
+            function generateField(i, field) {
+                var container = $('<li/>',{style:"background: #fff; margin:0; padding:8px 0px 0px; border-bottom: 1px solid #ccc;"});
+                var row = $('<div/>').appendTo(container);
+                var row2 = $('<div/>',{style:"padding-top:5px; padding-left:175px;"}).appendTo(container);
+                var row3 = $('<div/>',{style:"padding-top:5px; padding-left:120px;"}).appendTo(container);
+
+                $('<i style="color:#eee; cursor:move; margin-left:3px;" class="node-input-field-handle fa fa-bars"></i>').appendTo(row);
+
+                var nameClass ="node-input-field-name"
+                if (!field.name) { 
+                    nameClass = nameClass + " input-error"; 
+                }
+                var nameField = $('<input/>',{class:nameClass,type:"text",style:"margin-left:15px; width: 45%", placeholder: 'Key name',value:field.name}).appendTo(row);
+
+                nameField.keyup(function() {
+                    var value = $(this).val();
+
+                    if (value && $(this).hasClass('input-error')) {
+                        $(this).removeClass('input-error')
+                    }
+                    else {
+                        if (!value) {
+                            $(this).addClass('input-error')
+                        }
+                    }
+                });
+
+                var finalspan = $('<div/>',{style:"display: inline-block; width: 45%;"}).appendTo(row);
+                var deleteButton = $('<a/>',{href:"#",class:"editor-button editor-button-small", style:"left:45%; position:relative;"}).appendTo(finalspan);
+                $('<i/>',{class:"fa fa-remove"}).appendTo(deleteButton);
+
+                deleteButton.click(function() {
+                    container.find(".node-input-field-name").removeAttr('required')
+                    container.css({"background":"#fee"});
+                    container.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+
+                $("#node-input-field-container").append(container);
+            }
+
+            function generateIngredient(i, ingredient) {
+                var container = $('<li/>',{style:"background: #fff; margin:0; padding:8px 0px 0px; border-bottom: 1px solid #ccc;"});
+                var row = $('<div/>').appendTo(container);
+                var row2 = $('<div/>',{style:"padding-top:5px; padding-left:175px;"}).appendTo(container);
+                var row3 = $('<div/>',{style:"padding-top:5px; padding-left:120px;"}).appendTo(container);
+
+                $('<i style="color:#eee; cursor:move; margin-left:3px;" class="node-input-ingredient-handle fa fa-bars"></i>').appendTo(row);
+
+                var slugClass ="node-input-ingredient-slug"
+                if (!ingredient.slug) { 
+                    slugClass = slugClass + " input-error"; 
+                }
+                var slugField = $('<input/>',{class:slugClass,type:"text",style:"margin-left:15px; width: 45%", placeholder: 'Slug',value:ingredient.slug}).appendTo(row);
+
+                slugField.keyup(function() {
+                    var value = $(this).val();
+
+                    if (value && $(this).hasClass('input-error')) {
+                        $(this).removeClass('input-error')
+                    } else {
+                        if (!value) {
+                            $(this).addClass('input-error')
+                        }
+                    }
+                });
+
+                var finalspan = $('<div/>',{style:"display: inline-block; width: 45%;"}).appendTo(row);
+                var deleteButton = $('<a/>',{href:"#",class:"editor-button editor-button-small", style:"left:45%; position:relative;"}).appendTo(finalspan);
+                $('<i/>',{class:"fa fa-remove"}).appendTo(deleteButton);
+
+                deleteButton.click(function() {
+                    container.find(".node-input-ingredient-slug").removeAttr('required')
+                    container.css({"background":"#fee"});
+                    container.fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                });
+
+                $("#node-input-ingredient-container").append(container);
+            }
+
+            $("#node-input-add-field").click(function() {
+                generateField($("#node-input-field-container").children().length + 1, {
+                });
+                $("#node-input-field-container-div").scrollTop($("#node-input-field-container-div").get(0).scrollHeight);
+            });
+
+            for (var index = 0; index < this.fields.length; index ++) {
+                var field = this.fields[index];
+                generateField(index + 1, field);
+            }
+
+            $( "#node-input-field-container" ).sortable({
+                axis: "y",
+                handle:".node-input-field-handle",
+                cursor: "move"
+            });
+
+
+            $("#node-input-add-ingredient").click(function() {
+                generateIngredient($("#node-input-ingredient-container").children().length + 1, {
+                });
+                $("#node-input-ingredient-container-div").scrollTop($("#node-input-ingredient-container-div").get(0).scrollHeight);
+            });
+
+            for (var index = 0; index < this.ingredients.length; index ++) {
+                var ingredient = this.ingredients[index];
+                generateIngredient(index + 1, ingredient);
+            }
+
+            $( "#node-input-ingredient-container" ).sortable({
+                axis: "y",
+                handle:".node-input-ingredient-handle",
+                cursor: "move"
+            });
+        },
+        oneditsave: function() {
+            var node = this;
+
+            var fields = $("#node-input-field-container").children();
+            node.fields = [];
+            fields.each(function(i) {
+                var field = $(this);
+                
+                var name =  field.find(".node-input-field-name").val();
+                var settings = {
+                    name: name,
+                    sampleDataValid: "__" + name + "_sampleData_valid__",
+                    sampleDataInvalid: "__" + name + "_sampleData_invalid__"
+                };
+                node.fields.push(settings);
+            });
+
+            var ingredients = $("#node-input-ingredient-container").children();
+            node.ingredients = [];
+            ingredients.each(function(i) {
+                var ingredient = $(this);
+                
+                var settings = {
+                    slug: ingredient.find(".node-input-ingredient-slug").val()
+                };
+                node.ingredients.push(settings);
+            });
         }
     });
 </script>
@@ -44,18 +221,44 @@
         <label for="node-input-endpoint"><i class="fa fa-tag"></i> Endpoint</label>
         <input type="text" id="node-input-endpoint">
     </div>
-    <div class="form-row">
-        <label for="node-input-field"><i class="fa fa-tag"></i> Trigger field</label>
-        <input type="text" id="node-input-field" placeholder="Leave blank to not use one">
+
+
+    <div class="form-row node-input-field-container-row" style="margin-bottom:0px; width:100%; min-width:520px">
+        <label style="vertical-align:top;"><i class="fa fa-list-alt"></i> Fields</label>
+        <div style="display:inline-block; width:78%; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
+          <div style="width:100%; display: inline-block; background-color:#f3f3f3; padding-top:10px; padding-buttom:10px; border-top:0px solid; border-radius:5px 5px 0 0; border-bottom:1px solid #ccc;">
+              <div style="width:94%; display:inline-block; margin-left:32px">
+                <div style="width:45%; text-align:center; float:left;">Key name</div>
+                <div style="width:45%; text-align:center; float:left;">Remove</div>
+              </div>
+          </div>
+          <div id="node-input-field-container-div" style=" height: 257px; padding: 5px; overflow-y: scroll;">
+            <ol id="node-input-field-container" style=" list-style-type:none; margin: 0;"></ol>
+          </div>
+        </div>
     </div>
     <div class="form-row">
-        <label for="node-input-fieldValidSampleData"><i class="fa fa-tag"></i> Action field Valid Sample Data</label>
-        <input type="text" id="node-input-fieldValidSampleData" placeholder="If using an Trigger Field this is a required field">
+        <a href="#" class="editor-button editor-button-small" id="node-input-add-field" style="margin-top: 4px; margin-left: 103px;"><i class="fa fa-plus"></i> <span>Field</span></a>
+    </div>
+
+    <div class="form-row node-input-ingredient-container-row" style="margin-bottom:0px; width:100%; min-width:520px">
+        <label style="vertical-align:top;"><i class="fa fa-list-alt"></i> Ingredients</label>
+        <div style="display:inline-block; width:78%; border:1px solid #ccc; border-radius:5px; box-sizing:border-box;">
+          <div style="width:100%; display: inline-block; background-color:#f3f3f3; padding-top:10px; padding-buttom:10px; border-top:0px solid; border-radius:5px 5px 0 0; border-bottom:1px solid #ccc;">
+              <div style="width:94%; display:inline-block; margin-left:32px">
+                <div style="width:45%; text-align:center; float:left;">Slug</div>
+                <div style="width:45%; text-align:center; float:left;">Remove</div>
+              </div>
+          </div>
+          <div id="node-input-ingredient-container-div" style=" height: 257px; padding: 5px; overflow-y: scroll;">
+            <ol id="node-input-ingredient-container" style=" list-style-type:none; margin: 0;"></ol>
+          </div>
+        </div>
     </div>
     <div class="form-row">
-        <label for="node-input-fieldInvalidSampleData"><i class="fa fa-tag"></i> Trigger field SKIP Sample Data</label>
-        <input type="text" id="node-input-fieldInvalidSampleData" placeholder="If using an Trigger Field this is a required field">
+        <a href="#" class="editor-button editor-button-small" id="node-input-add-ingredient" style="margin-top: 4px; margin-left: 103px;"><i class="fa fa-plus"></i> <span>Ingredient</span></a>
     </div>
+
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
