@@ -32,7 +32,7 @@ We will do our best to change configuration only when necessary and do our best 
 
 Using this library requires an IFTTT account with access to the **IFTTT Platform Service**, both of which are free for private usage. To sign up visit here: [https://platform.ifttt.com/platform_sign_up](https://platform.ifttt.com/platform_sign_up).
 
-Using this library also requires that IFTTT has HTTP or HTTPS access to the machine you are running Node-RED on.
+Using this library also requires that IFTTT has HTTP or HTTPS access to the machine you are running Node-RED on. _**Note: just with any public facing server please take the steps to ensure your server is secure! If you haven't already read through the [Node-RED Security Documentation](https://nodered.org/docs/security) to take the necessary steps.**_ 
 
 ## Install
 
