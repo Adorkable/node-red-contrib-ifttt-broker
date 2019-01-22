@@ -20,6 +20,14 @@
       "ifttt-trigger": "ifttt-trigger.js"
     }
   },
+  "keywords": [
+    "node-red",
+    "ifttt",
+    "broker",
+    "trigger",
+    "action",
+    "api"
+  ],
   "devDependencies": {
     "eslint": "5.x",
     "eslint-plugin-angular": "4.x"
