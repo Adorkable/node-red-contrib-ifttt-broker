@@ -11,7 +11,7 @@ module.exports = function (RED) {
 
     var node = this;
     
-    utility.setNodeStatus(node, undefined);
+    utility.setNodeUnknownStatus(node, undefined);
 
     this.broker = n.broker;
     this.brokerNode = RED.nodes.getNode(this.broker);
@@ -32,9 +32,8 @@ module.exports = function (RED) {
           done();
       });
 
-      utility.setNodeStatus(node, true);
     } else {
-      utility.setNodeStatus(node, false);
+      utility.setNodeRegisterStatus(node, false);
     }
 
     // TODO: is this more robust, more dangerous, or no difference to calling node.send directly

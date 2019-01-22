@@ -82,13 +82,13 @@ module.exports = {
             }
       
             for(var index = 0; index < this.node.triggerEventQueue.length; index ++) {
-                const msg = this.node.triggerEventQueue[index];
+                const event = this.node.triggerEventQueue[index];
       
-                var result = createResult(this.node, msg.payload.createdAt);
+                var result = createResult(this.node, event.createdAt);
       
                 // TODO: ensure we have all fields configured for node expectation and IFTTT expectation
-                for(var index = 0; index < fields.length; index ++) {
-                    const field = fields[index];
+                for(var fieldsIndex = 0; fieldsIndex < fields.length; fieldsIndex ++) {
+                    const field = fields[fieldsIndex];
 
                     if (typeof field === 'object' && typeof field.name === 'string') {
                         const fieldValue = requestPayload.getField(field.name);
@@ -104,12 +104,12 @@ module.exports = {
 
                 var missingIngredients = [];
                 // TODO: ensure we have all ingredients configured for node expectation and IFTTT expectation
-                for(var index = 0; index < this.node.ingredients.length; index ++) {
-                    const ingredient = this.node.ingredients[index];
+                for(var ingredientsIndex = 0; ingredientsIndex < this.node.ingredients.length; ingredientsIndex ++) {
+                    const ingredient = this.node.ingredients[ingredientsIndex];
 
                     if (typeof ingredient === 'object' && typeof ingredient.slug === 'string') {
-                        if (typeof msg.payload.payload[ingredient.slug] !== 'undefined') {
-                            result[ingredient.slug] = msg.payload.payload[ingredient.slug];
+                        if (typeof event.payload[ingredient.slug] !== 'undefined') {
+                            result[ingredient.slug] = event.payload[ingredient.slug];
                         } else {
                             missingIngredients.push(ingredient.slug);
                         }
@@ -119,6 +119,8 @@ module.exports = {
                 // TODO: should potentially be handled downstream at queue?
                 if (missingIngredients.length === 0) {
                     results.push(result);
+
+                    event.sent = true;
                 } else {
                     this.node.error("Trigger event payload missing ingredients: '" + missingIngredients + "'")
                 }      
@@ -126,6 +128,8 @@ module.exports = {
       
             this.node.log("Sending IFTTT " + results.length + " trigger events");
       
+            this.node.updateNodeStatus();
+
             return callback(null, results);
         }
 
