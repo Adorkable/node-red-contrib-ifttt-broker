@@ -17,7 +17,7 @@ module.exports = function (RED) {
     var httpServer;
     
     var iftttService = new ifttt({ 
-      serviceKey: n.serviceKey,
+      serviceKey: this.credentials.serviceKey,
       logger: logger(node)
     });
     this.ifttt = iftttService;
@@ -42,5 +42,13 @@ module.exports = function (RED) {
     httpServer = expressApp.listen(this.expressPort);
   }
 
-  RED.nodes.registerType('ifttt-broker', IFTTTBrokerNode);
+  RED.nodes.registerType(
+    'ifttt-broker', 
+    IFTTTBrokerNode,
+    {
+      credentials: {
+        serviceKey: { type: "password" }
+      }
+    }
+    );
 };

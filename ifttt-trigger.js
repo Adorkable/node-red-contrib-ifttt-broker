@@ -10,7 +10,7 @@ module.exports = function (RED) {
 
     var node = this;
     
-    utility.setNodeStatus(node, undefined);
+    utility.setNodeUnknownStatus(node, undefined);
 
     this.broker = n.broker;
     this.brokerNode = RED.nodes.getNode(this.broker);
@@ -22,16 +22,36 @@ module.exports = function (RED) {
 
     this.triggerEventQueue = [];
 
-    this.addTriggerEvent = function(msg) { 
-      msg.payload = {
-        payload: msg.payload,
-        createdAt: new Date()
-      };
-      this.triggerEventQueue.unshift(msg);
-
-      // this.log("Queued trigger event");
-      // console.log(msg);
+    this.unsentTriggerEventCount = function() {
+      return this.triggerEventQueue.filter(function(test) {
+        return test.sent === false;
+      }).length;
     };
+
+    this.updateNodeStatus = function() {
+      if (this.brokerNode.ifttt) {
+        const count = this.unsentTriggerEventCount();
+        this.status({
+          fill: count > 0 ? "yellow" : "green",
+          shape: "dot",
+          text: count + " unsent"
+        });
+      } else {
+        utility.setNodeRegisterStatus(this, false);
+      }
+    };
+
+    this.addTriggerEvent = function(msg) { 
+      const event = {
+        payload: msg.payload,
+        createdAt: new Date(),
+        sent: false
+      };
+      this.triggerEventQueue.unshift(event);
+
+      this.updateNodeStatus();
+    };
+
     this.on("input", function(msg) {
       msg.topic = this.endpoint;
 
@@ -49,11 +69,8 @@ module.exports = function (RED) {
         this.brokerNode.ifttt.unregisterTrigger(triggerInstance);
         done();
       });
-
-      utility.setNodeStatus(node, true);
-    } else {
-      utility.setNodeStatus(node, false);
     }
+    this.updateNodeStatus();
   }
 
   RED.nodes.registerType('ifttt-trigger', IFTTTTriggerNode);

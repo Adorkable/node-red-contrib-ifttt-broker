@@ -9,13 +9,21 @@ module.exports = {
         return from;
     },
 
-    createNodeStatus: function(statusValue) {
+    createNodeUnknownStatus: function() {
+        return {
+            fill: "gray",
+            shape: "dot",
+            text: "unknown"
+        };
+    },
+
+    setNodeUnknownStatus: function(node) {
+        node.status(this.createNodeUnknownStatus());
+    },
+
+    createNodeRegisterStatus: function(statusValue) {
         if (typeof statusValue !== 'boolean') {
-            return {
-                fill: "gray",
-                shape: "dot",
-                text: "unknown"
-            };
+            return this.createNodeUnknownStatus();
         } else if (statusValue === true) {
             return {
                 fill: "green",
@@ -31,9 +39,9 @@ module.exports = {
         };
     },
 
-    setNodeStatus: function(node, statusValue) {
+    setNodeRegisterStatus: function(node, statusValue) {
         node.status(
-            this.createNodeStatus(statusValue)
+            this.createNodeRegisterStatus(statusValue)
         );
     },
 
