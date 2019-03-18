@@ -62,7 +62,7 @@ module.exports = {
             // TODO: error if required field isn't provided
             // TODO: ensure we have all fields configured for response requirements
             for(var index = 0; index < fields.length; index ++) {
-                const field = fields[field];
+                const field = fields[index];
 
                 if (typeof field === 'object' && typeof field.name === 'string') {
                     const fieldValue = requestPayload.getField(field.name);
