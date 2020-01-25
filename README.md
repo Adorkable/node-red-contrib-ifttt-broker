@@ -4,7 +4,8 @@ An IFTTT Broker for Node-RED
 ![dependencies](https://img.shields.io/david/adorkable/node-red-contrib-ifttt-broker.svg?style=flat-square)
 ![dev-dependencies](https://img.shields.io/david/dev/adorkable/node-red-contrib-ifttt-broker.svg?style=flat-square)
 ![optional-dependencies](https://img.shields.io/david/optional/adorkable/node-red-contrib-ifttt-broker.svg?style=flat-square)
-![peer-dependencies](https://img.shields.io/david/peer/adorkable/node-red-contrib-ifttt-broker.svg?style=flat-square) 
+![peer-dependencies](https://img.shields.io/david/peer/adorkable/node-red-contrib-ifttt-broker.svg?style=flat-square) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FAdorkable%2Fnode-red-contrib-ifttt-broker.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FAdorkable%2Fnode-red-contrib-ifttt-broker?ref=badge_shield)
+
 
 <img src="images/Works_with_IFTTT_Badge-white_on_black-88x48.svg" alt="Works with IFTTT" width="88"/>
 
@@ -75,3 +76,7 @@ There are many ways this library will be further built out but if you want a fea
 This library stands on the shoulders of [Amadeus'](https://github.com/amadeusmuc) library [node-ifttt](https://github.com/amadeusmuc/node-ifttt), many thanks! 
 
 Additionally the library was inspired by [node-red-contrib-mqtt-broker](https://github.com/zuhito/node-red-contrib-mqtt-broker), which is such a boon for locally routed MQTT communication!
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FAdorkable%2Fnode-red-contrib-ifttt-broker.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FAdorkable%2Fnode-red-contrib-ifttt-broker?ref=badge_large)
