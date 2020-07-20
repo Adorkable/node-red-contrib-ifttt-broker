@@ -13,6 +13,9 @@
     "express": "^4.16.4",
     "ifttt": "github:Adorkable-forkable/node-ifttt"
   },
+  "peerDependencies": {
+    "node-red-dashboard": "2.23.x"
+  },
   "node-red": {
     "nodes": {
       "ifttt-broker": "ifttt-broker.js",
@@ -29,7 +32,7 @@
     "api"
   ],
   "devDependencies": {
-    "eslint": "5.x",
+    "eslint": "^7.5.0",
     "eslint-plugin-angular": "4.x"
   }
 }
